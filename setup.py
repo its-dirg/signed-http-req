@@ -1,15 +1,14 @@
 # pylint: disable=missing-docstring
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='signed-http-req',
+    description='Python implementation of Signed HTTP Requests for OAuth.',
     version='0.1',
-    packages=['signed_http_req'],
+    packages=find_packages('src'),
     package_dir={'': 'src'},
-    install_requires=["pyjwkest"],
-    url='',
-    license='',
+    install_requires=['pyjwkest'],
+    url='https://github.com/its-dirg/signed-http-req',
     author='DIRG',
-    author_email='',
-    description=''
+    author_email='dirg@its.umu.se',
 )
