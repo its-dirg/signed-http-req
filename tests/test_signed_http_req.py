@@ -7,7 +7,7 @@ from signed_http_req import _get_hash_size
 from signed_http_req import UnknownAlgError
 from signed_http_req import _hash_value
 from signed_http_req import sign_http
-from signed_http_req import verify
+from signed_http_req import verify_http
 from signed_http_req import ValidationError
 from signed_http_req import EmptyHTTPRequestError
 
@@ -66,7 +66,7 @@ def test_hash_value():
 
 def test_verify():
     result = sign_http(alg=ALG, time_stamp=TIME_STAMP, **TEST_DATA)
-    verify(http_req=result, **TEST_DATA)
+    verify_http(http_req=result, **TEST_DATA)
 
 
 @pytest.mark.parametrize("key,value", [
@@ -82,7 +82,7 @@ def test_verify_fail(key, value, monkeypatch):
     result = sign_http(alg=ALG, time_stamp=TIME_STAMP, **TEST_DATA)
     monkeypatch.setitem(TEST_DATA, key, value)
     with pytest.raises(ValidationError):
-        verify(http_req=result, **TEST_DATA)
+        verify_http(http_req=result, **TEST_DATA)
 
 
 @pytest.mark.parametrize("key,value", [
@@ -93,7 +93,7 @@ def test_verify_strict(key, value, monkeypatch):
     result = sign_http(alg=ALG, time_stamp=TIME_STAMP, **TEST_DATA)
     monkeypatch.setitem(TEST_DATA, key, value)
     with pytest.raises(ValidationError):
-        verify(http_req=result, strict_query_param=True, strict_req_header=True, **TEST_DATA)
+        verify_http(http_req=result, strict_query_param=True, strict_req_header=True, **TEST_DATA)
 
 
 @pytest.mark.parametrize("key,value", [
@@ -103,4 +103,4 @@ def test_verify_strict(key, value, monkeypatch):
 def test_verify_not_strict(key, value, monkeypatch):
     result = sign_http(alg=ALG, time_stamp=TIME_STAMP, **TEST_DATA)
     monkeypatch.setitem(TEST_DATA, key, value)
-    verify(http_req=result, strict_query_param=False, strict_req_header=False, **TEST_DATA)
+    verify_http(http_req=result, strict_query_param=False, strict_req_header=False, **TEST_DATA)

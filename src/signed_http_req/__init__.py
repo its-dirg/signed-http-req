@@ -41,13 +41,17 @@ def sign_http(key, alg, method="", url_host="", path="", query_param=None,
         http_json["p"] = path
 
     if query_param:
-        param_keys, param_buffer = _serialize_dict(query_param, QUERY_PARAM_FORMAT)
-        param_hash = urlsafe_b64encode(_hash_value(hash_size, param_buffer)).decode("utf-8")
+        param_keys, param_buffer = _serialize_dict(query_param,
+                                                   QUERY_PARAM_FORMAT)
+        param_hash = urlsafe_b64encode(
+            _hash_value(hash_size, param_buffer)).decode("utf-8")
         http_json["q"] = [param_keys, param_hash]
 
     if req_header:
-        header_keys, header_buffer = _serialize_dict(req_header, REQUEST_HEADER_FORMAT)
-        header_hash = urlsafe_b64encode(_hash_value(hash_size, header_buffer)).decode("utf-8")
+        header_keys, header_buffer = _serialize_dict(req_header,
+                                                     REQUEST_HEADER_FORMAT)
+        header_hash = urlsafe_b64encode(
+            _hash_value(hash_size, header_buffer)).decode("utf-8")
         http_json["h"] = [header_keys, header_hash]
 
     if req_body:
@@ -90,8 +94,10 @@ def _serialize_dict(data, form):
     return keys, "".join(buffer)
 
 
-def verify(key, http_req, method="", url_host="", path="", query_param=None,
-           req_header=None, req_body=None, strict_query_param=False, strict_req_header=False):
+def verify_http(key, http_req, method="", url_host="", path="",
+                query_param=None,
+                req_header=None, req_body=None, strict_query_param=False,
+                strict_req_header=False):
     _jw = jws.factory(http_req)
     if _jw:
         _jwt = JWT().unpack(http_req)
@@ -111,23 +117,28 @@ def verify(key, http_req, method="", url_host="", path="", query_param=None,
         if "q" in unpacked_req:
             param_keys, param_hash = unpacked_req["q"]
             cmp_hash_str = "".join(
-                [QUERY_PARAM_FORMAT.format(k, query_param[k]) for k in param_keys])
+                [QUERY_PARAM_FORMAT.format(k, query_param[k]) for k in
+                 param_keys])
             cmp_hash = urlsafe_b64encode(
-                _hash_value(_get_hash_size(_header["alg"]), cmp_hash_str)).decode("utf-8")
+                _hash_value(_get_hash_size(_header["alg"]),
+                            cmp_hash_str)).decode("utf-8")
             _equal(cmp_hash, param_hash)
             if strict_query_param and len(param_keys) != len(query_param):
                 raise ValidationError("To many or to few query params")
         if "h" in unpacked_req:
             header_keys, header_hash = unpacked_req["h"]
             cmp_hash_str = "".join(
-                [REQUEST_HEADER_FORMAT.format(k, req_header[k]) for k in header_keys])
+                [REQUEST_HEADER_FORMAT.format(k, req_header[k]) for k in
+                 header_keys])
             cmp_hash = urlsafe_b64encode(
-                _hash_value(_get_hash_size(_header["alg"]), cmp_hash_str)).decode("utf-8")
+                _hash_value(_get_hash_size(_header["alg"]),
+                            cmp_hash_str)).decode("utf-8")
             _equal(cmp_hash, header_hash)
             if strict_req_header and len(header_keys) != len(req_header):
                 raise ValidationError("To many or to few headers")
         if "b" in unpacked_req:
-            cmp_body = urlsafe_b64encode(req_body.encode("utf-8")).decode("utf-8")
+            cmp_body = urlsafe_b64encode(req_body.encode("utf-8")).decode(
+                "utf-8")
             _equal(cmp_body, unpacked_req["b"])
 
 
